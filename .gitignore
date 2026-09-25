@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Environment & secrets
+.env
+.env*.local
+backups/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Vercel
+.vercel/
+
+# Supabase CLI local state
+supabase/.temp/
+supabase/.branches/
+
+# Build / cache
+dist/
+build/
+.turbo/
+coverage/
+.nyc_output/
+tsconfig.tsbuildinfo
+public/js/**/*.map
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editors (optional — remove if you want to share IDE config)
+.vscode/
+.idea/
+*.swp
+*.swo
