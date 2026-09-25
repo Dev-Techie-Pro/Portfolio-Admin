@@ -1,0 +1,4 @@
+import { SYSTEM_TAB_HTML } from './systemTabHtml';
+import { SETTINGS_BODY_HTML_PREFIX, SETTINGS_BODY_HTML_SUFFIX } from './bodyHtmlParts';
+
+export const BODY_HTML = SETTINGS_BODY_HTML_PREFIX + SYSTEM_TAB_HTML.trim() + SETTINGS_BODY_HTML_SUFFIX;

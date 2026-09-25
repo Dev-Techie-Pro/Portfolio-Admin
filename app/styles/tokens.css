@@ -1,0 +1,172 @@
+:root {
+  --pa-orange: #ff6600;
+  --pa-orange-hover: #e85d00;
+  --pa-red: #e5484d;
+  --pa-green: #22c55e;
+  --pa-yellow: #ced11b;
+  --pa-blue: #445deb;
+  --pa-light: #fff;
+  --pa-pink: #f0437e;
+  --pa-purple: #dc12f7;
+  --pa-web: #60a5fa;
+  --pa-edu: #a78bfa;
+  --pa-desk: #38bdf8;
+  --pa-teal: #31f1d8;
+
+  --pa-orange-rgb: 255, 102, 0;
+  --pa-red-rgb: 229, 72, 77;
+  --pa-green-rgb: 34, 197, 94;
+  --pa-yellow-rgb: 206, 209, 27;
+  --pa-blue-rgb: 68, 93, 235;
+  --pa-pink-rgb: 240, 67, 126;
+  --pa-purple-rgb: 220, 18, 247;
+  --pa-web-rgb: 96, 165, 250;
+  --pa-edu-rgb: 167, 139, 250;
+  --pa-desk-rgb: 56, 189, 248;
+  --pa-teal-rgb: 49, 241, 216;
+
+  --pa-orange-dim:      rgba(var(--pa-orange-rgb), 0.12);
+  --pa-orange-lighter:  rgba(var(--pa-orange-rgb), 0.50);
+  --pa-orange-glow:     rgba(var(--pa-orange-rgb), 0.22);
+  --pa-orange-border:   rgba(var(--pa-orange-rgb), 0.28);
+
+  --pa-red-dim:         rgba(var(--pa-red-rgb), 0.12);
+  --pa-red-border:      rgba(var(--pa-red-rgb), 0.32);
+
+  --pa-green-dim:       rgba(var(--pa-green-rgb), 0.12);
+  --pa-green-glow:      rgba(var(--pa-green-rgb), 0.24);
+  --pa-green-border:    rgba(var(--pa-green-rgb), 0.32);
+
+  --pa-yellow-dim:      rgba(var(--pa-yellow-rgb), 0.50);
+  --pa-yellow-border:   rgba(var(--pa-yellow-rgb), 0.32);
+
+  --pa-blue-dim:        rgba(var(--pa-desk-rgb),   0.14);
+  --pa-blue-border:     rgba(var(--pa-web-rgb),    0.32);
+
+  --pa-pink-dim:        rgba(var(--pa-pink-rgb), 0.12);
+  --pa-pink-border:     rgba(var(--pa-pink-rgb), 0.32);
+
+  --pa-web-dim:         rgba(var(--pa-web-rgb),  0.12);
+  --pa-edu-dim:         rgba(var(--pa-edu-rgb),  0.12);
+  --pa-edu-border:      rgba(var(--pa-edu-rgb),  0.32);
+  --pa-desk-dim:        rgba(var(--pa-desk-rgb), 0.14);
+
+  --pa-teal-dim:        rgba(var(--pa-teal-rgb), 0.12);
+  --pa-teal-border:     rgba(var(--pa-teal-rgb), 0.32);
+
+  --pa-bg:          #0c0c0d;
+  --pa-bg-raised:   #111113;
+  --pa-bg-card:     #141416;
+  --pa-bg-input:    #1a1a1c;
+  --pa-bg-chip:     #1e1e21;
+
+  --pa-border:        #1e1e21;
+  --pa-border-soft:   #232326;
+  --pa-border-hover:  #2c2c30;
+
+  --pa-text:       #ffffff;
+  --pa-text-dim:   #9a9aa0;
+  --pa-text-mute:  #6b6b70;
+  --pa-text-faint: #4a4a4f;
+  --pa-text-ghost: #333336;
+
+  --pa-hover-ghost:    rgba(255, 255, 255, 0.02);
+  --pa-hover-faint:    rgba(255, 255, 255, 0.06);
+  --pa-border-ghost:   rgba(255, 255, 255, 0.12);
+  --pa-overlay-faint:  rgba(0, 0, 0, 0.60);
+
+  --pa-sidebar-rail-w:       56px;
+  --pa-sidebar-panel-w:     248px;
+  --pa-sidebar-w:           calc(var(--pa-sidebar-rail-w) + var(--pa-sidebar-panel-w));
+  --pa-sidebar-w-collapsed: var(--pa-sidebar-rail-w);
+  --pa-panel-w:             430px;
+  --pa-radius-xs:  2px;
+  --pa-radius-sm:  8px;
+  --pa-radius:    10px;
+  --pa-radius-md: 14px;
+  --pa-radius-lg: 25px;
+
+  --pa-font-display: "Outfit", sans-serif;
+  --pa-font-body:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --pa-font-mono:    "JetBrains Mono", monospace;
+
+  --pa-fs-xm: 8px;
+  --pa-fs-sm:  10px;
+  --pa-fs-xmd: 12px;
+  --pa-fs-md:  14px;
+  --pa-fs-lg:  16px;
+  --pa-fs-xl:  22px;
+  --pa-fs-xxl: 42px;
+
+  --pa-fw-xs: 300;
+  --pa-fw-sm: 400;
+  --pa-fw-md: 500;
+  --pa-fw-lg: 600;
+  --pa-fw-xl: 700;
+
+  --pa-gap-xs:   2px;
+  --pa-gap-sm:   5px;
+  --pa-card-gap: 10px;
+
+  --pa-icon-nav:    var(--pa-fs-md);
+  --pa-icon-action: var(--pa-fs-lg);
+  --pa-icon-stat:   var(--pa-fs-xl);
+  --pa-icon-toggle: var(--pa-fs-lg);
+  --pa-icon-header: 18px;
+  --pa-icon-empty:  40px;
+  --pa-icon-circle: 44px;
+  --pa-icon-btn:    38px;
+}
+
+body.light {
+  color-scheme: light;
+
+  --pa-bg:        #ffffff;
+  --pa-bg-raised: #f7f7f8;
+  --pa-bg-card:   #f1f1f3;
+  --pa-bg-input:  #ececef;
+  --pa-bg-chip:   #e4e4e7;
+
+  --pa-border:        #e4e4e7;
+  --pa-border-soft:   #dcdce0;
+  --pa-border-hover:  #c7c7cd;
+
+  --pa-text:       #18181b;
+  --pa-text-dim:   #71717a;
+  --pa-text-mute:  #8d8d8f;
+  --pa-text-faint: #c4c4c9;
+  --pa-text-ghost: #e4e4e7;
+
+  --pa-hover-ghost:  rgba(0, 0, 0, 0.02);
+  --pa-hover-faint:  rgba(0, 0, 0, 0.05);
+  --pa-border-ghost: rgba(0, 0, 0, 0.08);
+
+  --pa-orange-dim:     rgba(var(--pa-orange-rgb), 0.08);
+  --pa-orange-lighter: rgba(var(--pa-orange-rgb), 0.16);
+  --pa-orange-glow:    rgba(var(--pa-orange-rgb), 0.12);
+  --pa-orange-border:  rgba(var(--pa-orange-rgb), 0.20);
+
+  --pa-red-dim:        rgba(var(--pa-red-rgb), 0.08);
+  --pa-red-border:     rgba(var(--pa-red-rgb), 0.22);
+
+  --pa-green-dim:      rgba(var(--pa-green-rgb), 0.08);
+  --pa-green-glow:     rgba(var(--pa-green-rgb), 0.14);
+  --pa-green-border:   rgba(var(--pa-green-rgb), 0.22);
+
+  --pa-yellow-dim:     rgba(var(--pa-yellow-rgb), 0.14);
+  --pa-yellow-border:  rgba(var(--pa-yellow-rgb), 0.22);
+
+  --pa-blue-dim:       rgba(var(--pa-desk-rgb),  0.08);
+  --pa-blue-border:    rgba(var(--pa-web-rgb),   0.22);
+
+  --pa-pink-dim:       rgba(var(--pa-pink-rgb), 0.08);
+  --pa-pink-border:    rgba(var(--pa-pink-rgb), 0.22);
+
+  --pa-web-dim:        rgba(var(--pa-web-rgb),  0.08);
+  --pa-edu-dim:        rgba(var(--pa-edu-rgb),  0.08);
+  --pa-edu-border:     rgba(var(--pa-edu-rgb),  0.22);
+  --pa-desk-dim:       rgba(var(--pa-desk-rgb), 0.08);
+
+  --pa-teal-dim:       rgba(var(--pa-teal-rgb), 0.08);
+  --pa-teal-border:    rgba(var(--pa-teal-rgb), 0.22);
+}
