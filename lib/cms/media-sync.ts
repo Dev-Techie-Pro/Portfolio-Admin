@@ -5,6 +5,17 @@ import { SITE_ID, legacyUuid } from './constants';
 const IMAGE_URL_RE = /^(https?:\/\/|data:image\/)/i;
 const MEDIA_URL_RE = /^(https?:\/\/|data:)/i;
 
+/** PostgREST / HTTP2 fail on multi‑MB JSON bodies; entity rows may still store larger data URLs. */
+const MAX_MEDIA_SYNC_DATA_URL_CHARS = 64_000;
+
+/** Whether a reference can be mirrored into media_assets (usage counts, library UI). */
+export function isSyncableMediaReference(ref) {
+  const url = typeof ref?.url === 'string' ? ref.url.trim() : '';
+  if (!isMediaUrl(url)) return false;
+  if (url.startsWith('data:') && url.length > MAX_MEDIA_SYNC_DATA_URL_CHARS) return false;
+  return true;
+}
+
 function sb() {
   return createAdminClient();
 }
@@ -143,7 +154,7 @@ async function findExistingByUrls(client, urls) {
  * @param {MediaReference[]} references
  */
 export async function ensureMediaAssets(references) {
-  const refs = dedupeMediaReferences(references);
+  const refs = dedupeMediaReferences(references).filter(isSyncableMediaReference);
   if (!refs.length) return;
 
   const client = sb();
@@ -579,7 +590,7 @@ export async function reconcileEntityMediaForRefs(references) {
     return reconcileAllEntityMedia();
   }
 
-  const refs = dedupeMediaReferences(references);
+  const refs = dedupeMediaReferences(references).filter(isSyncableMediaReference);
   const urls = refs.map((ref) => ref.url.trim()).filter(isMediaUrl);
   if (!urls.length) return { ensured: 0, removed: 0 };
 

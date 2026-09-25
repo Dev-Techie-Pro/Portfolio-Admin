@@ -19,7 +19,7 @@ function getSidebar() {
   return document.getElementById("paSidebar");
 }
 function getCollapseHost() {
-  return document.querySelector(".pa-header-top-left") || document.querySelector(".pa-header-page-left");
+  return document.getElementById("paSidebarCollapseHost") || document.querySelector(".pa-sidebar-panel-head") || document.querySelector(".pa-header-top-left") || document.querySelector(".pa-header-page-left");
 }
 function getTooltipLabel(el) {
   if (el.classList.contains("pa-logo-link")) return "Portfolio Dashboard";

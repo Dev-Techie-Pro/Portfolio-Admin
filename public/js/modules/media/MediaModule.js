@@ -2,7 +2,8 @@ import { Module } from "../../core/Module.js";
 import { $id, $all, escapeHtml } from "../../utils/dom.js";
 import { formatFileSize, formatDate } from "../../utils/format.js";
 import { appendCopySuffix } from "../../utils/strings.js";
-import { readFileAsDataUrl, handleFileValidation } from "../../utils/files.js";
+import { handleFileValidation } from "../../utils/files.js";
+import { uploadCmsFile } from "../../utils/media-upload.js";
 import { requestDelete, requestBulkAction } from "../../modules/shell/confirm.js";
 import { closeAllCardMenus, toggleCardMenu } from "../../modules/shell/cardMenu.js";
 import { renderPaMediaCard, getMediaKind } from "../../utils/paMediaCard.js";
@@ -676,7 +677,7 @@ class MediaModule extends Module {
   renderStagedGrid() {
     const grid = $id("paUploadStagedGrid");
     if (!grid) return;
-    grid.innerHTML = this.stagedFiles.map((sf, i) => `<div class="pa-gallery-thumb"><img src="${sf.dataUrl}" alt="${escapeHtml(sf.name)}" /><div class="pa-gallery-thumb-remove" data-i="${i}" role="button" aria-label="Remove ${escapeHtml(sf.name)}"><i class="ri-close-line"></i></div></div>`).join("");
+    grid.innerHTML = this.stagedFiles.map((sf, i) => `<div class="pa-gallery-thumb"><img src="${escapeHtml(sf.previewUrl || sf.url || "")}" alt="${escapeHtml(sf.name)}" /><div class="pa-gallery-thumb-remove" data-i="${i}" role="button" aria-label="Remove ${escapeHtml(sf.name)}"><i class="ri-close-line"></i></div></div>`).join("");
     grid.querySelectorAll(".pa-gallery-thumb-remove").forEach((btn) => {
       btn.addEventListener("click", () => {
         this.stagedFiles.splice(parseInt(btn.dataset.i, 10), 1);
@@ -694,8 +695,8 @@ class MediaModule extends Module {
     for (const file of files) {
       if (!handleFileValidation(file)) continue;
       try {
-        const dataUrl = await readFileAsDataUrl(file);
-        this.stagedFiles.push({ file, dataUrl, name: file.name, size: file.size, type: file.type });
+        const previewUrl = URL.createObjectURL(file);
+        this.stagedFiles.push({ file, previewUrl, url: "", name: file.name, size: file.size, type: file.type });
         accepted++;
       } catch {
         this.toast(`Could not read "${file.name}".`, "danger");
@@ -745,9 +746,10 @@ class MediaModule extends Module {
       return;
     }
     try {
-      const dataUrl = await readFileAsDataUrl(file);
+      const previewUrl = URL.createObjectURL(file);
       this.editPendingImage = {
-        dataUrl,
+        file,
+        previewUrl,
         name: file.name,
         size: file.size,
         type: file.type
@@ -767,7 +769,7 @@ class MediaModule extends Module {
     const pending = this.editPendingImage;
     const original = this.editOriginalImage;
     if (img) {
-      const src = pending?.dataUrl || original?.url || "";
+      const src = pending?.previewUrl || pending?.url || original?.url || "";
       img.src = src;
       const alt = $id("paEditAlt")?.value.trim() || $id("paEditFileName")?.value.trim() || "";
       img.alt = alt;
@@ -777,7 +779,7 @@ class MediaModule extends Module {
     }
     if (sizeEl) {
       const size = pending?.size ?? original?.size;
-      const url = pending?.dataUrl || original?.url;
+      const url = pending?.previewUrl || pending?.url || original?.url;
       sizeEl.textContent = size != null || url ? formatFileSize(size, url) : "\u2014";
     }
   }
@@ -835,11 +837,24 @@ class MediaModule extends Module {
     const folder = $id("paUploadFolder").value;
     const altBase = $id("paUploadAlt").value.trim();
     const uploadedNames = [];
-    const newRecords = this.stagedFiles.map((sf) => {
-      const record = { id: this.nextId++, name: sf.name, url: sf.dataUrl, alt: altBase, folder, size: sf.size, type: sf.type, uploadedAt: (/* @__PURE__ */ new Date()).toISOString(), usageCount: 0 };
-      uploadedNames.push(record.name);
-      return record;
-    });
+    const newRecords = [];
+    this.statusToast("Uploading to storage\u2026", "info", 12e4);
+    for (const sf of this.stagedFiles) {
+      const uploaded = await uploadCmsFile(sf.file, { folder });
+      newRecords.push({
+        id: this.nextId++,
+        name: sf.name,
+        url: uploaded.url,
+        alt: altBase,
+        folder,
+        size: uploaded.size || sf.size,
+        type: uploaded.mimeType || sf.type,
+        uploadedAt: (/* @__PURE__ */ new Date()).toISOString(),
+        usageCount: 0
+      });
+      uploadedNames.push(sf.name);
+      if (sf.previewUrl) URL.revokeObjectURL(sf.previewUrl);
+    }
     const prev = this.store.get("records");
     this.store.set("records", prev.concat(newRecords));
     try {
@@ -888,10 +903,14 @@ class MediaModule extends Module {
     m.name = name;
     m.alt = $id("paEditAlt").value.trim();
     m.folder = $id("paEditFolder").value;
-    if (this.editPendingImage) {
-      m.url = this.editPendingImage.dataUrl;
-      m.size = this.editPendingImage.size;
-      m.type = this.editPendingImage.type;
+    if (this.editPendingImage?.file) {
+      const uploaded = await uploadCmsFile(this.editPendingImage.file, {
+        folder: m.folder || "general"
+      });
+      m.url = uploaded.url;
+      m.size = uploaded.size;
+      m.type = uploaded.mimeType;
+      if (this.editPendingImage.previewUrl) URL.revokeObjectURL(this.editPendingImage.previewUrl);
     }
     try {
       await this.persist();

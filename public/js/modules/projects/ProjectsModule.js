@@ -1,7 +1,8 @@
 import { Module } from "../../core/Module.js";
 import { $id, $all, escapeHtml } from "../../utils/dom.js";
 import { isValidUrl } from "../../utils/strings.js";
-import { readFileAsDataUrl, handleFileValidation } from "../../utils/files.js";
+import { handleFileValidation } from "../../utils/files.js";
+import { uploadCmsFileWithPreview } from "../../utils/media-upload.js";
 import { setupRte } from "../../utils/rte.js";
 import { storage } from "../../core/StorageService.js";
 import { addChip, getChipValues, populateChips } from "../../utils/chips.js";
@@ -608,13 +609,23 @@ class ProjectsModule extends Module {
     const acceptFile = async (file) => {
       if (!handleFileValidation(file)) return;
       try {
-        const dataUrl = await readFileAsDataUrl(file);
-        if (prefix === "add") this.addFeaturedImage = { url: dataUrl, name: file.name };
-        else this.editFeaturedImage = { url: dataUrl, name: file.name };
+        const uploaded = await uploadCmsFileWithPreview(file, {
+          folder: "projects",
+          optimize: { maxWidth: 1920, maxHeight: 1080, quality: 0.88 },
+          onPreview: (previewUrl) => {
+            const entry2 = { url: previewUrl, name: file.name };
+            if (prefix === "add") this.addFeaturedImage = entry2;
+            else this.editFeaturedImage = entry2;
+            this.renderFeaturedPreview(prefix);
+          }
+        });
+        const entry = { url: uploaded.url, name: uploaded.fileName || file.name };
+        if (prefix === "add") this.addFeaturedImage = entry;
+        else this.editFeaturedImage = entry;
         this.renderFeaturedPreview(prefix);
         this.toast("Image uploaded", "success");
       } catch {
-        this.toast("Could not read that image file", "danger");
+        this.toast("Could not upload that image", "danger");
       }
     };
     this.on(fileInput, "change", async () => {
@@ -673,8 +684,11 @@ class ProjectsModule extends Module {
       for (const file of files) {
         if (!handleFileValidation(file)) continue;
         try {
-          const dataUrl = await readFileAsDataUrl(file);
-          const entry = { url: dataUrl, name: file.name };
+          const uploaded = await uploadCmsFileWithPreview(file, {
+            folder: "projects",
+            optimize: { maxWidth: 1920, maxHeight: 1080, quality: 0.88 }
+          });
+          const entry = { url: uploaded.url, name: uploaded.fileName || file.name };
           if (prefix === "add") this.addGalleryImages.push(entry);
           else this.editGalleryImages.push(entry);
         } catch {

@@ -33,7 +33,7 @@ export function applyUserDisplay(user) {
   });
 
   document.querySelectorAll(
-    '#paUserMenuAvatar, #paUserMenu .pa-avatar, .pa-header-user .pa-avatar, #paUserDropdownAvatar .pa-avatar, #paRailAvatar .pa-avatar',
+    '#paUserMenuAvatar, #paUserMenu .pa-avatar, .pa-header-user .pa-avatar, #paUserDropdownAvatar .pa-avatar, #paRailAvatar .pa-rail-profile-mark',
   ).forEach((el) => {
     renderAvatarElement(el, user.avatarUrl);
   });
@@ -90,7 +90,7 @@ export function renderAvatarElement(container, url) {
 /** Update only avatar images in the header dropdown (instant preview while uploading). */
 export function previewUserAvatar(url) {
   document.querySelectorAll(
-    '#paUserMenuAvatar, #paUserMenu .pa-avatar, .pa-header-user .pa-avatar, #paUserDropdownAvatar .pa-avatar, #paRailAvatar .pa-avatar',
+    '#paUserMenuAvatar, #paUserMenu .pa-avatar, .pa-header-user .pa-avatar, #paUserDropdownAvatar .pa-avatar, #paRailAvatar .pa-rail-profile-mark',
   ).forEach((el) => {
     renderAvatarElement(el, url);
   });

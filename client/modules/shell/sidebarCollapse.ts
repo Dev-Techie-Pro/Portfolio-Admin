@@ -24,7 +24,9 @@ function getSidebar() {
 }
 
 function getCollapseHost() {
-  return document.querySelector('.pa-header-top-left')
+  return document.getElementById('paSidebarCollapseHost')
+    || document.querySelector('.pa-sidebar-panel-head')
+    || document.querySelector('.pa-header-top-left')
     || document.querySelector('.pa-header-page-left');
 }
 

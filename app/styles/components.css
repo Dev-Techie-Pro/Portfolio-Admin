@@ -2731,51 +2731,6 @@ body.pa-settings-readonly .pa-tab-panel[data-panel="settings"] .pa-toggle-switch
   opacity: 0.65;
 }
 
-.pa-tab-panel[data-panel="settings"] .pa-card-collapse-trigger {
-  cursor: pointer;
-  user-select: none;
-}
-
-.pa-tab-panel[data-panel="settings"] .pa-card-collapse-trigger:focus-visible {
-  outline: 2px solid var(--pa-orange);
-  outline-offset: 2px;
-  border-radius: var(--pa-radius-sm);
-}
-
-.pa-tab-panel[data-panel="settings"] .pa-card-collapse-trigger .pa-card-collapse-icon {
-  margin-left: auto;
-  flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--pa-icon-header);
-  color: var(--pa-text-dim);
-  background: transparent;
-  border-radius: var(--pa-radius-sm);
-  transition:
-    transform 0.2s ease,
-    color 0.2s ease;
-}
-
-.pa-tab-panel[data-panel="settings"] .pa-card-collapse-trigger:hover .pa-card-collapse-icon {
-  color: var(--pa-text);
-}
-
-.pa-tab-panel[data-panel="settings"] .pa-settings-card.is-collapsed .pa-card-collapse-icon {
-  transform: rotate(-90deg);
-}
-
-.pa-tab-panel[data-panel="settings"] .pa-settings-card.is-collapsed .pa-card-collapse-trigger {
-  margin-bottom: 0;
-}
-
-.pa-tab-panel[data-panel="settings"] .pa-settings-card.is-collapsed .pa-card-collapse-body {
-  display: none;
-}
-
-
 #socialLinksContainer.grid.fr-2 .pa-social-group {
   margin-bottom: 0;
 }

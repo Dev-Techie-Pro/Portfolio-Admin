@@ -41,20 +41,34 @@ export function syncSidebarRailActive() {
   });
 }
 
-function focusNavGroup(section: string) {
+function setGroupExpanded(group, open) {
+  if (!group) return;
+  group.classList.add('pa-nav-anim-ready');
+  group.classList.toggle('open', open);
+  group.querySelector(':scope > .pa-nav-parent-row .pa-nav-toggle')
+    ?.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+function toggleNavGroup(section: string) {
   const group = getNavGroup(section);
   if (!group) return;
 
   if (isSidebarCollapsedDesktop()) {
+    const flyout = document.getElementById('paNavFlyout');
+    if (flyout?.classList.contains('visible') && group.classList.contains('flyout-open')) {
+      hideNavFlyout();
+      return;
+    }
     showNavFlyout(group);
     return;
   }
 
   hideNavFlyout();
-  group.classList.add('pa-nav-anim-ready', 'open');
-  group.querySelector(':scope > .pa-nav-parent-row .pa-nav-toggle')
-    ?.setAttribute('aria-expanded', 'true');
-  group.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  const nextOpen = !group.classList.contains('open');
+  setGroupExpanded(group, nextOpen);
+  if (nextOpen) {
+    group.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
 }
 
 let railBound = false;
@@ -69,10 +83,8 @@ export function initSidebarRailNav() {
       e.preventDefault();
       const section = btn.dataset.railTarget;
       if (!section) return;
-      document.querySelectorAll('.pa-rail-btn[data-rail-target]').forEach((el) => {
-        el.classList.toggle('active', el === btn);
-      });
-      focusNavGroup(section);
+      toggleNavGroup(section);
+      syncSidebarRailActive();
     });
   });
 

@@ -37,7 +37,9 @@ function syncGroupChrome(group) {
   const toggle = group.querySelector(":scope > .pa-nav-parent-row .pa-nav-toggle");
   const activeChild = group.querySelector(":scope > .pa-nav-submenu .pa-nav-subitem.active");
   const groupActive = !!activeChild;
+  const parentBtn = group.querySelector(":scope > .pa-nav-parent-row .pa-nav-item--parent");
   toggle?.classList.toggle("active", groupActive);
+  parentBtn?.classList.toggle("active", groupActive);
   setGroupOpen(group, groupActive);
 }
 function handleGroupToggle(e) {

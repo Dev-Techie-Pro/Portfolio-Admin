@@ -1,6 +1,7 @@
 import { authService } from "../core/AuthService.js";
 import { eventBus } from "../core/EventBus.js";
-import { handleFileValidation, readOptimizedImageDataUrl } from "./files.js";
+import { handleFileValidation } from "./files.js";
+import { uploadCmsFileWithPreview } from "./media-upload.js";
 import { applyUserDisplay, previewUserAvatar } from "./user-display.js";
 import { showToast } from "../modules/shell/toast.js";
 const AVATAR_OPTS = { maxWidth: 192, maxHeight: 192, quality: 0.78 };
@@ -15,8 +16,11 @@ async function uploadUserAvatar(file, opts = {}) {
   const avatarBtn = document.getElementById("paUserDropdownAvatar");
   avatarBtn?.classList.add("is-uploading");
   try {
-    const avatarUrl = await readOptimizedImageDataUrl(file, AVATAR_OPTS);
-    const data = await authService.updateProfile({ avatarUrl });
+    const uploaded = await uploadCmsFileWithPreview(file, {
+      folder: "avatars",
+      optimize: AVATAR_OPTS
+    });
+    const data = await authService.updateProfile({ avatarUrl: uploaded.url });
     const profile = data?.profile ?? data;
     if (!profile || typeof profile !== "object") {
       throw new Error("Server did not return an updated profile.");

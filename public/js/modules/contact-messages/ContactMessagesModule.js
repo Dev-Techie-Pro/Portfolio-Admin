@@ -870,11 +870,19 @@ class ContactMessagesModule extends Module {
           return;
         }
         try {
-          const contentBase64 = await this.readFileAsBase64(file);
-          this.setReplyAttachment(file, contentBase64);
+          const { uploadContactAttachment } = await import("../../utils/media-upload.js");
+          const uploaded = await uploadContactAttachment(file);
+          this.setReplyAttachmentFromMedia({
+            url: uploaded.url,
+            name: uploaded.fileName || file.name,
+            type: uploaded.mimeType || file.type,
+            size: uploaded.size || file.size
+          });
+          this.toast("Attachment uploaded", "success");
         } catch {
-          this.toast("Could not read attachment.", "danger");
+          this.toast("Could not upload attachment.", "danger");
         }
+        fileInput.value = "";
       });
     }
     const mailWrap = $id("paMailPreviewWrap");

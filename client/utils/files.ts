@@ -17,7 +17,7 @@ export function readFileAsDataUrl(file) {
  * @param {File} file
  * @param {{ maxWidth?: number, maxHeight?: number, quality?: number }} [options]
  */
-export function readOptimizedImageDataUrl(file, { maxWidth = 1200, maxHeight = 600, quality = 0.85 } = {}) {
+function drawOptimizedImageToCanvas(file, { maxWidth = 1200, maxHeight = 600, quality = 0.85 } = {}) {
   return new Promise((resolve, reject) => {
     const objectUrl = URL.createObjectURL(file);
     const img = new Image();
@@ -41,7 +41,7 @@ export function readOptimizedImageDataUrl(file, { maxWidth = 1200, maxHeight = 6
       ctx.drawImage(img, 0, 0, width, height);
 
       const outputType = file.type === 'image/png' && scale === 1 ? 'image/png' : 'image/jpeg';
-      resolve(canvas.toDataURL(outputType, quality));
+      resolve({ canvas, outputType, quality });
     };
 
     img.onerror = () => {
@@ -51,6 +51,25 @@ export function readOptimizedImageDataUrl(file, { maxWidth = 1200, maxHeight = 6
 
     img.src = objectUrl;
   });
+}
+
+export function readOptimizedImageDataUrl(file, options = {}) {
+  return drawOptimizedImageToCanvas(file, options).then(({ canvas, outputType, quality }) => (
+    canvas.toDataURL(outputType, quality)
+  ));
+}
+
+/** Compressed image blob for Supabase Storage upload (avoids base64 in CMS rows). */
+export function readOptimizedImageBlob(file, { maxWidth = 1200, maxHeight = 600, quality = 0.85 } = {}) {
+  return drawOptimizedImageToCanvas(file, { maxWidth, maxHeight, quality }).then(
+    ({ canvas, outputType, quality: q }) => new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => (blob ? resolve({ blob, mimeType: outputType }) : reject(new Error('Could not process image.'))),
+        outputType,
+        q,
+      );
+    }),
+  );
 }
 
 export function handleFileValidation(file) {
@@ -65,15 +84,25 @@ export function handleFileValidation(file) {
   return true;
 }
 
-export async function readValidFiles(fileList) {
+export async function readValidFiles(fileList, { folder = 'general' } = {}) {
+  const { uploadCmsFile } = await import('./media-upload.js');
   const files = Array.from(fileList || []);
   const results = [];
   for (const file of files) {
     if (!handleFileValidation(file)) continue;
     try {
-      const url = await readFileAsDataUrl(file);
-      results.push({ url, name: file.name, size: file.size, type: file.type });
+      const uploaded = await uploadCmsFile(file, {
+        folder,
+        optimize: { maxWidth: 1920, maxHeight: 1080, quality: 0.88 },
+      });
+      results.push({
+        url: uploaded.url,
+        name: uploaded.fileName || file.name,
+        size: uploaded.size || file.size,
+        type: uploaded.mimeType || file.type,
+      });
     } catch {
+      /* skip failed upload */
     }
   }
   return results;

@@ -2,7 +2,8 @@ import { Module } from '../../core/Module.js';
 import { storage } from '../../core/StorageService.js';
 import { $id, escapeHtml } from '../../utils/dom.js';
 import { isValidUrl, isValidSlug, slugify } from '../../utils/strings.js';
-import { readFileAsDataUrl, handleFileValidation } from '../../utils/files.js';
+import { handleFileValidation } from '../../utils/files.js';
+import { uploadCmsFileWithPreview } from '../../utils/media-upload.js';
 import { setupRte } from '../../utils/rte.js';
 import { addChip, getChipValues } from '../../utils/chips.js';
 import { parseSortInput, sortByNewestFirst } from '../../utils/format.js';
@@ -289,8 +290,8 @@ export class QuickAddModule extends Module {
       const c = $id('qaPrjShortDescCount');
       if (c) c.textContent = e.target.value.length;
     });
-    this.setupFeaturedUpload('qaPrjMediaUpload', 'qaPrjFeaturedFile', () => this.prjFeaturedImage, (v) => { this.prjFeaturedImage = v; });
-    this.setupGalleryUpload('qaPrjGalleryUpload', 'qaPrjGalleryFile', () => this.prjGalleryImages, (v) => { this.prjGalleryImages = v; }, 'qaPrjGalleryGrid');
+    this.setupFeaturedUpload('qaPrjMediaUpload', 'qaPrjFeaturedFile', () => this.prjFeaturedImage, (v) => { this.prjFeaturedImage = v; }, 'projects');
+    this.setupGalleryUpload('qaPrjGalleryUpload', 'qaPrjGalleryFile', () => this.prjGalleryImages, (v) => { this.prjGalleryImages = v; }, 'qaPrjGalleryGrid', 'projects');
   }
 
   validateProjectBasic() {
@@ -378,7 +379,7 @@ export class QuickAddModule extends Module {
   // ─── Testimonial ──────────────────────────────────────────────────
 
   wireTestimonialForm() {
-    this.setupAvatarDropzone('qaTestiAvatarDropzone', 'qaTestiAvatarFileInput', 'qaTestiAvatarPreviewWrap', 'qaTestiAvatarPreviewImg', 'qaTestiAvatarRemoveBtn', () => this.testiImage, (v) => { this.testiImage = v; });
+    this.setupAvatarDropzone('qaTestiAvatarDropzone', 'qaTestiAvatarFileInput', 'qaTestiAvatarPreviewWrap', 'qaTestiAvatarPreviewImg', 'qaTestiAvatarRemoveBtn', () => this.testiImage, (v) => { this.testiImage = v; }, 'testimonials');
     this.on($id('qaTestiQuote'), 'input', (e) => {
       const c = $id('qaTestiQuoteCount');
       if (c) c.textContent = e.target.value.length;
@@ -501,7 +502,7 @@ export class QuickAddModule extends Module {
       addChip($id('qaBlogTagChips'), input.value);
       input.value = '';
     });
-    this.setupAvatarDropzone('qaBlogImageDropzone', 'qaBlogImageFileInput', 'qaBlogImagePreviewWrap', 'qaBlogImagePreviewImg', 'qaBlogImageRemoveBtn', () => this.blogImage, (v) => { this.blogImage = v; });
+    this.setupAvatarDropzone('qaBlogImageDropzone', 'qaBlogImageFileInput', 'qaBlogImagePreviewWrap', 'qaBlogImagePreviewImg', 'qaBlogImageRemoveBtn', () => this.blogImage, (v) => { this.blogImage = v; }, 'blog');
   }
 
   validateBlogContent() {
@@ -568,25 +569,38 @@ export class QuickAddModule extends Module {
 
   // ─── Shared upload helpers ──────────────────────────────────────────
 
-  setupFeaturedUpload(boxId, inputId, getImg, setImg) {
+  setupFeaturedUpload(boxId, inputId, getImg, setImg, folder = 'projects') {
     const box = $id(boxId);
     const input = $id(inputId);
     if (!box || !input) return;
     const previewWrapId = boxId.replace('MediaUpload', 'FeaturedPreviewWrap');
     const accept = async (file) => {
       if (!handleFileValidation(file)) return;
-      const dataUrl = await readFileAsDataUrl(file);
-      setImg({ url: dataUrl, name: file.name });
       const wrap = $id(previewWrapId);
-      if (wrap) {
-        wrap.innerHTML = `<div class="pa-media-preview"><img src="${dataUrl}" alt="${file.name}" /><button type="button" class="pa-media-preview-remove" aria-label="Remove"><i class="ri-close-line"></i></button></div>`;
-        wrap.querySelector('.pa-media-preview-remove')?.addEventListener('click', () => {
-          setImg(null);
-          wrap.innerHTML = '';
-          box.style.display = '';
+      try {
+        const uploaded = await uploadCmsFileWithPreview(file, {
+          folder,
+          optimize: { maxWidth: 1920, maxHeight: 1080, quality: 0.88 },
+          onPreview: (previewUrl) => {
+            setImg({ url: previewUrl, name: file.name });
+            if (wrap) {
+              wrap.innerHTML = `<div class="pa-media-preview"><img src="${previewUrl}" alt="${file.name}" /><button type="button" class="pa-media-preview-remove" aria-label="Remove"><i class="ri-close-line"></i></button></div>`;
+            }
+          },
         });
+        setImg({ url: uploaded.url, name: file.name });
+        if (wrap) {
+          wrap.innerHTML = `<div class="pa-media-preview"><img src="${uploaded.url}" alt="${file.name}" /><button type="button" class="pa-media-preview-remove" aria-label="Remove"><i class="ri-close-line"></i></button></div>`;
+          wrap.querySelector('.pa-media-preview-remove')?.addEventListener('click', () => {
+            setImg(null);
+            wrap.innerHTML = '';
+            box.style.display = '';
+          });
+        }
+        box.style.display = 'none';
+      } catch {
+        this.toast('Could not upload image', 'danger');
       }
-      box.style.display = 'none';
     };
     this.on(box, 'click', () => input.click());
     this.on(input, 'change', async () => { const f = input.files?.[0]; input.value = ''; if (f) await accept(f); });
@@ -595,7 +609,7 @@ export class QuickAddModule extends Module {
     this.on(box, 'drop', async (e) => { const f = e.dataTransfer?.files?.[0]; if (f) await accept(f); });
   }
 
-  setupGalleryUpload(boxId, inputId, getArr, setArr, gridId) {
+  setupGalleryUpload(boxId, inputId, getArr, setArr, gridId, folder = 'projects') {
     const box = $id(boxId);
     const input = $id(inputId);
     if (!box || !input) return;
@@ -622,7 +636,11 @@ export class QuickAddModule extends Module {
       for (const file of files) {
         if (!handleFileValidation(file)) continue;
         try {
-          arr.push({ url: await readFileAsDataUrl(file), name: file.name });
+          const uploaded = await uploadCmsFileWithPreview(file, {
+            folder,
+            optimize: { maxWidth: 1920, maxHeight: 1080, quality: 0.88 },
+          });
+          arr.push({ url: uploaded.url, name: file.name });
         } catch { /* skip */ }
       }
       setArr(arr);
@@ -631,7 +649,7 @@ export class QuickAddModule extends Module {
     });
   }
 
-  setupAvatarDropzone(dzId, inputId, wrapId, imgId, removeId, getData, setData) {
+  setupAvatarDropzone(dzId, inputId, wrapId, imgId, removeId, getData, setData, folder = 'avatars') {
     const dz = $id(dzId);
     const input = $id(inputId);
     const remove = $id(removeId);
@@ -653,18 +671,40 @@ export class QuickAddModule extends Module {
       const file = input.files?.[0];
       input.value = '';
       if (!file || !handleFileValidation(file)) return;
-      const dataUrl = await readFileAsDataUrl(file);
-      setData(dataUrl);
-      setPreview(dataUrl);
+      try {
+        const uploaded = await uploadCmsFileWithPreview(file, {
+          folder,
+          optimize: { maxWidth: 800, maxHeight: 800, quality: 0.85 },
+          onPreview: (previewUrl) => {
+            setData(previewUrl);
+            setPreview(previewUrl);
+          },
+        });
+        setData(uploaded.url);
+        setPreview(uploaded.url);
+      } catch {
+        this.toast('Could not upload image', 'danger');
+      }
     });
     ['dragenter', 'dragover'].forEach((evt) => this.on(dz, evt, (e) => { e.preventDefault(); dz.classList.add('dragover'); }));
     ['dragleave', 'drop'].forEach((evt) => this.on(dz, evt, (e) => { e.preventDefault(); dz.classList.remove('dragover'); }));
     this.on(dz, 'drop', async (e) => {
       const file = e.dataTransfer?.files?.[0];
       if (!file || !handleFileValidation(file)) return;
-      const dataUrl = await readFileAsDataUrl(file);
-      setData(dataUrl);
-      setPreview(dataUrl);
+      try {
+        const uploaded = await uploadCmsFileWithPreview(file, {
+          folder,
+          optimize: { maxWidth: 800, maxHeight: 800, quality: 0.85 },
+          onPreview: (previewUrl) => {
+            setData(previewUrl);
+            setPreview(previewUrl);
+          },
+        });
+        setData(uploaded.url);
+        setPreview(uploaded.url);
+      } catch {
+        this.toast('Could not upload image', 'danger');
+      }
     });
     if (remove) this.on(remove, 'click', (e) => { e.stopPropagation(); setData(null); setPreview(null); });
   }

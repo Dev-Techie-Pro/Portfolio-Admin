@@ -1,7 +1,8 @@
 import { CrudCardModule } from '../../core/CrudCardModule.js';
 import { escapeHtml, $id } from '../../utils/dom.js';
 import { formatDate, sortByNewestFirst } from '../../utils/format.js';
-import { readFileAsDataUrl, handleFileValidation } from '../../utils/files.js';
+import { handleFileValidation } from '../../utils/files.js';
+import { uploadCmsFileWithPreview } from '../../utils/media-upload.js';
 import { renderPaCatCard } from '../../utils/paCatCard.js';
 import { categoryKeyFromAccentHex } from '../../utils/categoryClassOptions.js';
 import { setStatTrend, setStatValue } from '../../utils/pageStats.js';
@@ -152,11 +153,25 @@ export class TestimonialsModule extends CrudCardModule {
     dropzone.setAttribute('tabindex', '0');
     dropzone.setAttribute('role', 'button');
 
+    const uploadAvatar = async (file) => {
+      const uploaded = await uploadCmsFileWithPreview(file, {
+        folder: 'testimonials',
+        optimize: { maxWidth: 512, maxHeight: 512, quality: 0.85 },
+        onPreview: (previewUrl) => setData(previewUrl),
+      });
+      setData(uploaded.url);
+      this.toast('Photo uploaded', 'success');
+    };
+
     this.on(fileInput, 'change', async () => {
       const file = fileInput.files?.[0];
       fileInput.value = '';
       if (!file || !handleFileValidation(file)) return;
-      setData(await readFileAsDataUrl(file));
+      try {
+        await uploadAvatar(file);
+      } catch {
+        this.toast('Could not upload photo', 'danger');
+      }
     });
 
     ['dragenter', 'dragover'].forEach((evt) => this.on(dropzone, evt, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); }));
@@ -164,7 +179,11 @@ export class TestimonialsModule extends CrudCardModule {
     this.on(dropzone, 'drop', async (e) => {
       const file = e.dataTransfer?.files?.[0];
       if (!file || !handleFileValidation(file)) return;
-      setData(await readFileAsDataUrl(file));
+      try {
+        await uploadAvatar(file);
+      } catch {
+        this.toast('Could not upload photo', 'danger');
+      }
     });
 
     this.on(removeBtn, 'click', (e) => { e.stopPropagation(); setData(null); });

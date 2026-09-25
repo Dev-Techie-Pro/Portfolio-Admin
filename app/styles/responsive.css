@@ -355,6 +355,8 @@
   }
 }
 @media (min-width: 861px) {
+  .pa-rail-collapse-wrap .pa-sidebar-collapse,
+  #paSidebarCollapseHost .pa-sidebar-collapse,
   .pa-header-top-left .pa-sidebar-collapse,
   .pa-header-page-left .pa-sidebar-collapse {
     display: flex;
@@ -393,7 +395,7 @@
     border-color: var(--pa-border-hover);
   }
 
-  .pa-sidebar.collapsed + .pa-main .pa-sidebar-collapse i {
+  .pa-sidebar.collapsed .pa-sidebar-collapse i {
     transform: rotate(180deg);
   }
 
@@ -1012,9 +1014,6 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pa-tab-panel[data-panel="settings"] .pa-card-collapse-trigger .pa-card-collapse-icon {
-    transition: none;
-  }
   .pa-nav-submenu,
   .pa-nav-toggle i {
     transition: none !important;

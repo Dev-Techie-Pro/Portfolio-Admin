@@ -3,7 +3,8 @@ import { escapeHtml, $id, $all } from "../../utils/dom.js";
 import { storage } from "../../core/StorageService.js";
 import { syncPaSelect } from "../../utils/paSelect.js";
 import { slugify, isValidSlug } from "../../utils/strings.js";
-import { readFileAsDataUrl, handleFileValidation } from "../../utils/files.js";
+import { handleFileValidation } from "../../utils/files.js";
+import { uploadCmsFileWithPreview } from "../../utils/media-upload.js";
 import { setupRte } from "../../utils/rte.js";
 import { addChip, getChipValues, populateChips } from "../../utils/chips.js";
 import { activateTab, openPanel } from "../../modules/shell/panels.js";
@@ -252,7 +253,17 @@ class BlogModule extends CrudCardModule {
       const file = fileInput.files?.[0];
       fileInput.value = "";
       if (!file || !handleFileValidation(file)) return;
-      setData(await readFileAsDataUrl(file));
+      try {
+        const uploaded = await uploadCmsFileWithPreview(file, {
+          folder: "blog",
+          optimize: { maxWidth: 1600, maxHeight: 900, quality: 0.88 },
+          onPreview: (previewUrl) => setData(previewUrl)
+        });
+        setData(uploaded.url);
+        this.toast("Featured image uploaded", "success");
+      } catch {
+        this.toast("Could not upload image", "danger");
+      }
     });
     ["dragenter", "dragover"].forEach((evt) => this.on(dropzone, evt, (e) => {
       e.preventDefault();
@@ -265,7 +276,17 @@ class BlogModule extends CrudCardModule {
     this.on(dropzone, "drop", async (e) => {
       const file = e.dataTransfer?.files?.[0];
       if (!file || !handleFileValidation(file)) return;
-      setData(await readFileAsDataUrl(file));
+      try {
+        const uploaded = await uploadCmsFileWithPreview(file, {
+          folder: "blog",
+          optimize: { maxWidth: 1600, maxHeight: 900, quality: 0.88 },
+          onPreview: (previewUrl) => setData(previewUrl)
+        });
+        setData(uploaded.url);
+        this.toast("Featured image uploaded", "success");
+      } catch {
+        this.toast("Could not upload image", "danger");
+      }
     });
     this.on(removeBtn, "click", (e) => {
       e.stopPropagation();

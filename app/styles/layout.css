@@ -41,7 +41,6 @@ body:not(.pa-role-admin) .pa-admin-only-item {
 }
 
 .pa-rail-avatar {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,34 +51,43 @@ body:not(.pa-role-admin) .pa-admin-only-item {
   flex-shrink: 0;
 }
 
-.pa-rail-avatar-inner {
-  width: 36px;
-  height: 36px;
+.pa-rail-profile {
+  width: 38px;
+  height: 38px;
+  padding: 2px;
   border-radius: var(--pa-radius);
-  overflow: hidden;
-  border: 1px solid var(--pa-border-soft);
-  background: var(--pa-bg-input);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--pa-fs-lg);
-  color: var(--pa-text-mute);
+  background: linear-gradient(
+    145deg,
+    var(--pa-orange),
+    color-mix(in srgb, var(--pa-orange) 35%, var(--pa-border-soft))
+  );
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--pa-orange) 25%, transparent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.pa-rail-avatar-badge {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 16px;
-  height: 16px;
-  border-radius: var(--pa-radius);
-  background: var(--pa-orange);
-  color: var(--pa-light);
+.pa-rail-avatar:hover .pa-rail-profile {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--pa-orange) 22%, transparent);
+}
+
+.pa-rail-profile-mark {
+  width: 100%;
+  height: 100%;
+  border-radius: calc(var(--pa-radius) - 2px);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--pa-fs-xsm);
-  border: 2px solid var(--pa-bg-raised);
+  background: var(--pa-bg-input);
+  color: var(--pa-text-mute);
+  font-size: var(--pa-fs-lg);
+}
+
+.pa-rail-profile-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .pa-rail-nav {
@@ -92,14 +100,21 @@ body:not(.pa-role-admin) .pa-admin-only-item {
   padding: 4px 0;
 }
 
+.pa-rail-collapse-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 4px 0;
+  margin-top: auto;
+}
+
 .pa-rail-bottom {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--pa-gap-sm);
   width: 100%;
-  padding-top: 8px;
-  margin-top: auto;
+  padding-top: 4px;
 }
 
 .pa-rail-btn {
@@ -125,7 +140,7 @@ body:not(.pa-role-admin) .pa-admin-only-item {
 
 .pa-rail-btn.active {
   color: var(--pa-text);
-  background: color-mix(in srgb, var(--pa-text) 12%, transparent);
+  background: var(--pa-orange-dim);
 }
 
 .pa-rail-logout:hover {
@@ -773,7 +788,7 @@ a.pa-sidebar-brand.pa-logo-link,
 }
 
 .pa-nav-group.open .pa-nav-toggle--expand i {
-  transform: rotate(45deg);
+  transform: rotate(180deg);
 }
 
 .pa-nav-submenu {

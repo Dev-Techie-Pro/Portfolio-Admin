@@ -115,7 +115,7 @@ function navGroup(groupId, parent, subItems, defaultOpen = false) {
         <div class="pa-nav-group${openClass}" data-nav-group="${groupId}">
           <div class="pa-nav-parent-row">
             <button type="button" class="pa-nav-item pa-nav-item--parent" aria-label="Toggle ${parent.label} submenu"><i class="${parent.icon}"></i><span class="pa-nav-item-label">${parent.label}</span></button>
-            <button type="button" class="pa-nav-toggle pa-nav-toggle--expand" aria-label="Toggle ${parent.label} submenu" aria-expanded="${expanded}"><i class="ri-add-line"></i></button>
+            <button type="button" class="pa-nav-toggle pa-nav-toggle--expand" aria-label="Toggle ${parent.label} submenu" aria-expanded="${expanded}"><i class="ri-arrow-down-s-line"></i></button>
           </div>
           <div class="pa-nav-submenu" role="group" aria-label="${parent.label} submenu">
             <div class="pa-nav-submenu-inner">${submenuItems}</div>
@@ -131,8 +131,9 @@ function railBtn(section, icon, label) {
 export const SIDEBAR_INNER_HTML = `<aside class="pa-sidebar" id="paSidebar">
       <div class="pa-sidebar-rail" aria-label="Primary navigation">
         <a href="/settings/profile" class="pa-rail-avatar" id="paRailAvatar" aria-label="Profile">
-          <span class="pa-rail-avatar-inner pa-avatar"><i class="ri-user-3-fill"></i></span>
-          <span class="pa-rail-avatar-badge" aria-hidden="true"><i class="ri-add-line"></i></span>
+          <span class="pa-rail-profile" aria-hidden="true">
+            <span class="pa-rail-profile-mark"><i class="ri-user-3-fill"></i></span>
+          </span>
         </a>
         <div class="pa-rail-nav">
           ${railBtn('home', 'ri-home-5-line', 'Dashboard')}
@@ -141,8 +142,10 @@ export const SIDEBAR_INNER_HTML = `<aside class="pa-sidebar" id="paSidebar">
           ${railBtn('content', 'ri-article-line', 'Content & Media')}
           ${railBtn('settings', 'ri-folder-3-line', 'Settings')}
         </div>
+        <div class="pa-rail-collapse-wrap">
+          <div class="pa-sidebar-collapse-host" id="paSidebarCollapseHost"></div>
+        </div>
         <div class="pa-rail-bottom">
-          <a href="/contact-messages" class="pa-rail-btn" aria-label="Messages"><i class="ri-chat-3-line"></i></a>
           <button type="button" class="pa-rail-btn pa-rail-logout" id="paLogoutBtn" aria-label="Logout"><i class="ri-logout-box-r-line"></i></button>
         </div>
       </div>

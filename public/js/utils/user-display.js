@@ -24,7 +24,7 @@ function applyUserDisplay(user) {
     el.textContent = user.email || "";
   });
   document.querySelectorAll(
-    "#paUserMenuAvatar, #paUserMenu .pa-avatar, .pa-header-user .pa-avatar, #paUserDropdownAvatar .pa-avatar, #paRailAvatar .pa-avatar"
+    "#paUserMenuAvatar, #paUserMenu .pa-avatar, .pa-header-user .pa-avatar, #paUserDropdownAvatar .pa-avatar, #paRailAvatar .pa-rail-profile-mark"
   ).forEach((el) => {
     renderAvatarElement(el, user.avatarUrl);
   });
@@ -64,7 +64,7 @@ function renderAvatarElement(container, url) {
 }
 function previewUserAvatar(url) {
   document.querySelectorAll(
-    "#paUserMenuAvatar, #paUserMenu .pa-avatar, .pa-header-user .pa-avatar, #paUserDropdownAvatar .pa-avatar, #paRailAvatar .pa-avatar"
+    "#paUserMenuAvatar, #paUserMenu .pa-avatar, .pa-header-user .pa-avatar, #paUserDropdownAvatar .pa-avatar, #paRailAvatar .pa-rail-profile-mark"
   ).forEach((el) => {
     renderAvatarElement(el, url);
   });

@@ -24,8 +24,9 @@ import {
 } from "../../core/router.js";
 import { setupAllPasswordToggles } from "../../utils/password-toggle.js";
 import { syncSettingsNavTab } from "../shell/settingsNav.js";
-import { initSettingsCardCollapse } from "./settingsCardCollapse.js";
-import { readFileAsDataUrl, readOptimizedImageDataUrl, handleFileValidation } from "../../utils/files.js";
+import { activateTab } from "../shell/panels.js";
+import { handleFileValidation } from "../../utils/files.js";
+import { uploadCmsFileWithPreview } from "../../utils/media-upload.js";
 import { applyUserDisplay, renderPreviewAvatar, setCoverImage, applyRoleBasedAccess } from "../../utils/user-display.js";
 import { eventBus } from "../../core/EventBus.js";
 import { initRoleRequestCard } from "./roleRequest.js";
@@ -492,6 +493,7 @@ class SettingsModule extends Module {
     setCheck("maintenanceMode", s.maintenanceMode);
   }
   bindEvents() {
+    this.on(window, "popstate", () => this.syncUI());
     const saveGeneralBtn = document.querySelector('[data-save="general"]');
     if (saveGeneralBtn) {
       this.on(saveGeneralBtn, "click", () => {
@@ -699,7 +701,6 @@ class SettingsModule extends Module {
         }
       });
     });
-    initSettingsCardCollapse();
   }
   updateSettingsPageHeader(tab) {
     const meta = getSettingsPageMeta(tab);
@@ -714,6 +715,7 @@ class SettingsModule extends Module {
   applySettingsPage(tab) {
     const resolved = SETTINGS_TABS.includes(tab) ? tab : "general";
     this.store.set("activeTab", resolved);
+    activateTab("settings", resolved);
     this.updateSettingsPageHeader(resolved);
     syncSettingsNavTab(resolved);
     if (resolved === "general") {
@@ -877,14 +879,6 @@ class SettingsModule extends Module {
     eventBus.emit("profile:updated", profile);
     return profile;
   }
-  async readImageDataUrl(file, optimize) {
-    if (!optimize) return readFileAsDataUrl(file);
-    try {
-      return await readOptimizedImageDataUrl(file, optimize);
-    } catch {
-      return readFileAsDataUrl(file);
-    }
-  }
   async handleAvatarFile(file, inputEl) {
     if (!file) return;
     if (!handleFileValidation(file)) {
@@ -893,13 +887,13 @@ class SettingsModule extends Module {
     }
     showStatusToast("Saving avatar\u2026", "info", 12e4);
     try {
-      const dataUrl = await this.readImageDataUrl(file, {
-        maxWidth: 512,
-        maxHeight: 512,
-        quality: 0.88
+      const uploaded = await uploadCmsFileWithPreview(file, {
+        folder: "avatars",
+        optimize: { maxWidth: 512, maxHeight: 512, quality: 0.88 },
+        onPreview: (previewUrl) => renderPreviewAvatar($id("previewAvatar"), previewUrl)
       });
-      renderPreviewAvatar($id("previewAvatar"), dataUrl);
-      await this.saveProfileImages({ avatarUrl: dataUrl });
+      renderPreviewAvatar($id("previewAvatar"), uploaded.url);
+      await this.saveProfileImages({ avatarUrl: uploaded.url });
       showStatusToast("Avatar updated successfully!", "success");
     } catch (err) {
       const current = this.store.get("profile") || {};
@@ -916,13 +910,13 @@ class SettingsModule extends Module {
     }
     showStatusToast("Saving cover image\u2026", "info", 12e4);
     try {
-      const dataUrl = await this.readImageDataUrl(file, {
-        maxWidth: 1200,
-        maxHeight: 400,
-        quality: 0.85
+      const uploaded = await uploadCmsFileWithPreview(file, {
+        folder: "avatars",
+        optimize: { maxWidth: 1200, maxHeight: 400, quality: 0.85 },
+        onPreview: (previewUrl) => setCoverImage($id("coverImage"), previewUrl)
       });
-      setCoverImage($id("coverImage"), dataUrl);
-      await this.saveProfileImages({ coverImageUrl: dataUrl });
+      setCoverImage($id("coverImage"), uploaded.url);
+      await this.saveProfileImages({ coverImageUrl: uploaded.url });
       showStatusToast("Cover image updated successfully!", "success");
     } catch (err) {
       const current = this.store.get("profile") || {};

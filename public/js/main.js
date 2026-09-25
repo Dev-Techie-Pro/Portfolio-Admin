@@ -1,4 +1,12 @@
 import {
+  clearUserCredentials,
+  formatStaffRoleLabel,
+  initUserCredentialsPanel,
+  notifyCredentialsEmailStatus,
+  populateStaffRoleSelect,
+  showUserCredentialsPanel
+} from "./chunks/chunk-ACBYJDYB.js";
+import {
   applyRoleBasedAccess,
   applyUserDisplay,
   hideNavFlyout,
@@ -9,18 +17,10 @@ import {
   previewUserAvatar,
   showNavFlyout,
   syncSidebarGroupNav
-} from "./chunks/chunk-K2XQHGPR.js";
+} from "./chunks/chunk-AH4EORLU.js";
 import {
   initPasswordToggles
 } from "./chunks/chunk-5SJ7MEVC.js";
-import {
-  clearUserCredentials,
-  formatStaffRoleLabel,
-  initUserCredentialsPanel,
-  notifyCredentialsEmailStatus,
-  populateStaffRoleSelect,
-  showUserCredentialsPanel
-} from "./chunks/chunk-CXIDBH2N.js";
 import {
   authService
 } from "./chunks/chunk-MRY75FFO.js";
@@ -30,11 +30,11 @@ import {
 } from "./chunks/chunk-4MPBDRPZ.js";
 import {
   initAllPaSelects
-} from "./chunks/chunk-BHVLEK4H.js";
+} from "./chunks/chunk-5PDORXXL.js";
 import {
   handleFileValidation,
-  readOptimizedImageDataUrl
-} from "./chunks/chunk-QJVHZZLM.js";
+  uploadCmsFileWithPreview
+} from "./chunks/chunk-Q4LKM4W3.js";
 import {
   PAGE,
   getCurrentPage,
@@ -52,10 +52,8 @@ import {
   openPanel,
   registerPanel,
   requestLogout
-} from "./chunks/chunk-WGXNH5AX.js";
+} from "./chunks/chunk-WRYMBWPQ.js";
 import {
-  $all,
-  $id,
   APPEARANCE_DEFAULTS,
   ICON_PREVIEW_SIZES,
   MAX_CUSTOM_FONTS,
@@ -68,9 +66,7 @@ import {
   applyAppearanceSettings,
   bootstrapAppearanceFromCache,
   buildCustomFontFromFile,
-  clearDomCache,
   clearNotifications,
-  escapeHtml,
   eventBus,
   getFontById,
   getFontGroups,
@@ -79,11 +75,17 @@ import {
   normalizeAppearanceSettings,
   readAppearanceCache,
   renderNotifications,
-  showStatusToast,
-  showToast,
   storage,
   writeAppearanceCache
-} from "./chunks/chunk-OGR5OR6D.js";
+} from "./chunks/chunk-UVN7SZ5D.js";
+import {
+  $all,
+  $id,
+  clearDomCache,
+  escapeHtml,
+  showStatusToast,
+  showToast
+} from "./chunks/chunk-R5CPOL4O.js";
 
 // client/core/BodyLoader.ts
 var BodyLoader = class {
@@ -906,8 +908,11 @@ async function uploadUserAvatar(file, opts = {}) {
   const avatarBtn = document.getElementById("paUserDropdownAvatar");
   avatarBtn?.classList.add("is-uploading");
   try {
-    const avatarUrl = await readOptimizedImageDataUrl(file, AVATAR_OPTS);
-    const data = await authService.updateProfile({ avatarUrl });
+    const uploaded = await uploadCmsFileWithPreview(file, {
+      folder: "avatars",
+      optimize: AVATAR_OPTS
+    });
+    const data = await authService.updateProfile({ avatarUrl: uploaded.url });
     const profile = data?.profile ?? data;
     if (!profile || typeof profile !== "object") {
       throw new Error("Server did not return an updated profile.");
@@ -1577,17 +1582,30 @@ function syncSidebarRailActive() {
     btn.classList.toggle("active", btn.dataset.railTarget === section);
   });
 }
-function focusNavGroup(section) {
+function setGroupExpanded(group, open) {
+  if (!group) return;
+  group.classList.add("pa-nav-anim-ready");
+  group.classList.toggle("open", open);
+  group.querySelector(":scope > .pa-nav-parent-row .pa-nav-toggle")?.setAttribute("aria-expanded", open ? "true" : "false");
+}
+function toggleNavGroup(section) {
   const group = getNavGroup(section);
   if (!group) return;
   if (isSidebarCollapsedDesktop()) {
+    const flyout = document.getElementById("paNavFlyout");
+    if (flyout?.classList.contains("visible") && group.classList.contains("flyout-open")) {
+      hideNavFlyout();
+      return;
+    }
     showNavFlyout(group);
     return;
   }
   hideNavFlyout();
-  group.classList.add("pa-nav-anim-ready", "open");
-  group.querySelector(":scope > .pa-nav-parent-row .pa-nav-toggle")?.setAttribute("aria-expanded", "true");
-  group.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  const nextOpen = !group.classList.contains("open");
+  setGroupExpanded(group, nextOpen);
+  if (nextOpen) {
+    group.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
 }
 var railBound = false;
 function initSidebarRailNav() {
@@ -1599,10 +1617,8 @@ function initSidebarRailNav() {
       e.preventDefault();
       const section = btn.dataset.railTarget;
       if (!section) return;
-      document.querySelectorAll(".pa-rail-btn[data-rail-target]").forEach((el) => {
-        el.classList.toggle("active", el === btn);
-      });
-      focusNavGroup(section);
+      toggleNavGroup(section);
+      syncSidebarRailActive();
     });
   });
   window.addEventListener("popstate", syncSidebarRailActive);
@@ -1716,43 +1732,43 @@ var PREFETCH_BY_PAGE = window.__paPrefetchConfig?.PAGE_KEYS || {};
 async function loadPageModuleClass(page) {
   switch (page) {
     case "dashboard":
-      return (await import("./chunks/DashboardModule-TKWXYAUN.js")).DashboardModule;
+      return (await import("./chunks/DashboardModule-5C2GOQV2.js")).DashboardModule;
     case "projects":
-      return (await import("./chunks/ProjectsModule-UCF6O6DE.js")).ProjectsModule;
+      return (await import("./chunks/ProjectsModule-6J4DX4UV.js")).ProjectsModule;
     case "categories":
-      return (await import("./chunks/CategoriesModule-BAUYDXE7.js")).CategoriesModule;
+      return (await import("./chunks/CategoriesModule-BEEYYZUI.js")).CategoriesModule;
     case "tags":
-      return (await import("./chunks/TagsModule-6TAUCSM7.js")).TagsModule;
+      return (await import("./chunks/TagsModule-LKNIBZ2A.js")).TagsModule;
     case "technologies":
-      return (await import("./chunks/TechnologiesModule-XULEGXOR.js")).TechnologiesModule;
+      return (await import("./chunks/TechnologiesModule-AHSEGFG2.js")).TechnologiesModule;
     case "tool-categories":
-      return (await import("./chunks/ToolCategoriesModule-2WUGYSUJ.js")).ToolCategoriesModule;
+      return (await import("./chunks/ToolCategoriesModule-J5N4INXY.js")).ToolCategoriesModule;
     case "blog-categories":
-      return (await import("./chunks/BlogCategoriesModule-ZSAN6WG3.js")).BlogCategoriesModule;
+      return (await import("./chunks/BlogCategoriesModule-ZTXNIWOP.js")).BlogCategoriesModule;
     case "tools":
-      return (await import("./chunks/ToolsModule-B5OIQAAX.js")).ToolsModule;
+      return (await import("./chunks/ToolsModule-AWXGP4P6.js")).ToolsModule;
     case "media":
-      return (await import("./chunks/MediaModule-VO2MIULM.js")).MediaModule;
+      return (await import("./chunks/MediaModule-ELHZJWRW.js")).MediaModule;
     case "testimonials":
-      return (await import("./chunks/TestimonialsModule-DXVKFHVA.js")).TestimonialsModule;
+      return (await import("./chunks/TestimonialsModule-Y43CWLB7.js")).TestimonialsModule;
     case "blogposts":
-      return (await import("./chunks/BlogModule-5NAJENVL.js")).BlogModule;
+      return (await import("./chunks/BlogModule-S5HDAMCU.js")).BlogModule;
     case "experience":
-      return (await import("./chunks/ExperienceModule-DRZ2RQKT.js")).ExperienceModule;
+      return (await import("./chunks/ExperienceModule-Y6LE24LF.js")).ExperienceModule;
     case "contact-messages":
-      return (await import("./chunks/ContactMessagesModule-EOQDEV4G.js")).ContactMessagesModule;
+      return (await import("./chunks/ContactMessagesModule-K6X3GVSH.js")).ContactMessagesModule;
     case "users":
-      return (await import("./chunks/UsersModule-YKM5ELJI.js")).UsersModule;
+      return (await import("./chunks/UsersModule-KTKVYTIZ.js")).UsersModule;
     case "recent-activities":
-      return (await import("./chunks/RecentActivitiesModule-RXRMPU4M.js")).RecentActivitiesModule;
+      return (await import("./chunks/RecentActivitiesModule-F56YCNV4.js")).RecentActivitiesModule;
     case "settings":
-      return (await import("./chunks/SettingsModule-NMMFHR7F.js")).SettingsModule;
+      return (await import("./chunks/SettingsModule-2PQZVGK7.js")).SettingsModule;
     case "login":
-      return (await import("./chunks/LoginModule-EZ27DCRP.js")).LoginModule;
+      return (await import("./chunks/LoginModule-DA2MA6CP.js")).LoginModule;
     case "forgot-password":
-      return (await import("./chunks/ForgotPasswordModule-GLZKYSWY.js")).ForgotPasswordModule;
+      return (await import("./chunks/ForgotPasswordModule-TSD52QJ6.js")).ForgotPasswordModule;
     case "reset-password":
-      return (await import("./chunks/ResetPasswordModule-BZCBTGBF.js")).ResetPasswordModule;
+      return (await import("./chunks/ResetPasswordModule-OXOBCA65.js")).ResetPasswordModule;
     default:
       return null;
   }
@@ -1775,7 +1791,7 @@ function bindGlobalPanelChrome() {
 var quickAddModule = null;
 async function bindQuickAddButton(pageModule) {
   if (quickAddModule) return;
-  const { QuickAddModule } = await import("./chunks/QuickAddModule-FY4WIENK.js");
+  const { QuickAddModule } = await import("./chunks/QuickAddModule-MFKIO63Y.js");
   quickAddModule = new QuickAddModule(pageModule);
   quickAddModule.bindEvents();
 }

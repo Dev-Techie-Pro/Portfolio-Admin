@@ -137,7 +137,9 @@ export async function buildCustomFontFromFile(file) {
   const error = validateFontFile(file);
   if (error) throw new Error(error);
 
-  const url = await readFileAsDataUrl(file);
+  const { uploadCustomFontFile } = await import('./media-upload.js');
+  const uploaded = await uploadCustomFontFile(file);
+  const url = uploaded.url;
   const name = deriveFontName(file);
   const familyName = deriveFamilyName(name);
 
