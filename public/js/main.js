@@ -9,7 +9,7 @@ import {
   previewUserAvatar,
   showNavFlyout,
   syncSidebarGroupNav
-} from "./chunks/chunk-AR4ZME25.js";
+} from "./chunks/chunk-K2XQHGPR.js";
 import {
   initPasswordToggles
 } from "./chunks/chunk-5SJ7MEVC.js";
@@ -40,7 +40,7 @@ import {
   getCurrentPage,
   getLoginPath,
   getSettingsTabFromPath
-} from "./chunks/chunk-RDJAJ7S3.js";
+} from "./chunks/chunk-DUXXWVBL.js";
 import {
   activateTab,
   anyPanelOpen,
@@ -1716,37 +1716,37 @@ var PREFETCH_BY_PAGE = window.__paPrefetchConfig?.PAGE_KEYS || {};
 async function loadPageModuleClass(page) {
   switch (page) {
     case "dashboard":
-      return (await import("./chunks/DashboardModule-YKDRPMQR.js")).DashboardModule;
+      return (await import("./chunks/DashboardModule-TKWXYAUN.js")).DashboardModule;
     case "projects":
-      return (await import("./chunks/ProjectsModule-U67SJVOT.js")).ProjectsModule;
+      return (await import("./chunks/ProjectsModule-UCF6O6DE.js")).ProjectsModule;
     case "categories":
-      return (await import("./chunks/CategoriesModule-47ESTOML.js")).CategoriesModule;
+      return (await import("./chunks/CategoriesModule-BAUYDXE7.js")).CategoriesModule;
     case "tags":
-      return (await import("./chunks/TagsModule-BUE2ZIEL.js")).TagsModule;
+      return (await import("./chunks/TagsModule-6TAUCSM7.js")).TagsModule;
     case "technologies":
-      return (await import("./chunks/TechnologiesModule-3BWGQL23.js")).TechnologiesModule;
+      return (await import("./chunks/TechnologiesModule-XULEGXOR.js")).TechnologiesModule;
     case "tool-categories":
-      return (await import("./chunks/ToolCategoriesModule-WVWTF7IE.js")).ToolCategoriesModule;
+      return (await import("./chunks/ToolCategoriesModule-2WUGYSUJ.js")).ToolCategoriesModule;
     case "blog-categories":
-      return (await import("./chunks/BlogCategoriesModule-HEPNMXQF.js")).BlogCategoriesModule;
+      return (await import("./chunks/BlogCategoriesModule-ZSAN6WG3.js")).BlogCategoriesModule;
     case "tools":
-      return (await import("./chunks/ToolsModule-66QDDSUQ.js")).ToolsModule;
+      return (await import("./chunks/ToolsModule-B5OIQAAX.js")).ToolsModule;
     case "media":
-      return (await import("./chunks/MediaModule-6SEEZ3OZ.js")).MediaModule;
+      return (await import("./chunks/MediaModule-VO2MIULM.js")).MediaModule;
     case "testimonials":
-      return (await import("./chunks/TestimonialsModule-7FDMZVSC.js")).TestimonialsModule;
+      return (await import("./chunks/TestimonialsModule-DXVKFHVA.js")).TestimonialsModule;
     case "blogposts":
-      return (await import("./chunks/BlogModule-T2OK4IEG.js")).BlogModule;
+      return (await import("./chunks/BlogModule-5NAJENVL.js")).BlogModule;
     case "experience":
-      return (await import("./chunks/ExperienceModule-HJWCBLEF.js")).ExperienceModule;
+      return (await import("./chunks/ExperienceModule-DRZ2RQKT.js")).ExperienceModule;
     case "contact-messages":
       return (await import("./chunks/ContactMessagesModule-EOQDEV4G.js")).ContactMessagesModule;
     case "users":
-      return (await import("./chunks/UsersModule-BDMFT2F2.js")).UsersModule;
+      return (await import("./chunks/UsersModule-YKM5ELJI.js")).UsersModule;
     case "recent-activities":
       return (await import("./chunks/RecentActivitiesModule-RXRMPU4M.js")).RecentActivitiesModule;
     case "settings":
-      return (await import("./chunks/SettingsModule-D5INTJQJ.js")).SettingsModule;
+      return (await import("./chunks/SettingsModule-NMMFHR7F.js")).SettingsModule;
     case "login":
       return (await import("./chunks/LoginModule-EZ27DCRP.js")).LoginModule;
     case "forgot-password":
@@ -1775,7 +1775,7 @@ function bindGlobalPanelChrome() {
 var quickAddModule = null;
 async function bindQuickAddButton(pageModule) {
   if (quickAddModule) return;
-  const { QuickAddModule } = await import("./chunks/QuickAddModule-7KSL7KJ6.js");
+  const { QuickAddModule } = await import("./chunks/QuickAddModule-FY4WIENK.js");
   quickAddModule = new QuickAddModule(pageModule);
   quickAddModule.bindEvents();
 }
